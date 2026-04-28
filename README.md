@@ -14,7 +14,7 @@ Built with [Orpheus TTS](https://github.com/canopylabs/orpheus-tts), [Kokoro](ht
   > 
   > Easiest way to get the right version on Windows — run this in a terminal:
   > ```
-  > winget install 9NQ7512CXL7T
+  > winget install Python.Python.3.13
   > ```
 - **NVIDIA GPU strongly recommended** — an RTX card will generate in seconds; CPU works but is very slow
 - **~10 GB free disk space** for model downloads (cached locally after first run)
