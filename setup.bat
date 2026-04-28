@@ -9,53 +9,45 @@ echo    Narrate Studio — First-time Setup
 echo  ===========================================
 echo.
 
-:: ── Check Python ──────────────────────────────────────────────────────────────
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo  [ERROR] Python was not found.
+:: ── Find a compatible Python (3.10–3.13) ──────────────────────────────────────
+set PYTHON=
+
+:: Try the Python Launcher (py) with specific versions first
+for %%V in (3.13 3.12 3.11 3.10) do (
+    if "!PYTHON!"=="" (
+        py -%%V --version >nul 2>&1
+        if not errorlevel 1 (
+            set PYTHON=py -%%V
+            for /f "tokens=2" %%v in ('py -%%V --version 2^>^&1') do set PY_VER=%%v
+        )
+    )
+)
+
+:: Fall back to plain "python" if py launcher didn't find anything
+if "!PYTHON!"=="" (
+    python --version >nul 2>&1
+    if not errorlevel 1 (
+        for /f "tokens=2" %%v in ('python --version 2^>^&1') do set PY_VER=%%v
+        for /f "tokens=1,2 delims=." %%a in ("!PY_VER!") do (
+            set PY_MAJOR=%%a
+            set PY_MINOR=%%b
+        )
+        if !PY_MINOR! GEQ 10 if !PY_MINOR! LEQ 13 set PYTHON=python
+    )
+)
+
+if "!PYTHON!"=="" (
+    echo  [ERROR] No compatible Python version found (need 3.10-3.13^).
     echo.
-    echo  Please install Python 3.10, 3.11, 3.12, or 3.13 from:
-    echo    https://www.python.org/downloads/
+    echo  Install Python 3.13 with:
+    echo    winget install Python.Python.3.13
     echo.
-    echo  Make sure to tick "Add Python to PATH" during install.
+    echo  Or download from https://www.python.org/downloads/
     pause
     exit /b 1
 )
 
-for /f "tokens=2" %%v in ('python --version 2^>^&1') do set PY_VER=%%v
-echo  [OK] Found Python %PY_VER%
-
-:: Parse major.minor
-for /f "tokens=1,2 delims=." %%a in ("%PY_VER%") do (
-    set PY_MAJOR=%%a
-    set PY_MINOR=%%b
-)
-
-:: Warn if Python version is unsupported
-if %PY_MAJOR% LSS 3 (
-    echo  [ERROR] Python 3.10 or newer is required.
-    pause
-    exit /b 1
-)
-if %PY_MAJOR% EQU 3 (
-    if %PY_MINOR% LSS 10 (
-        echo  [ERROR] Python 3.10 or newer is required. You have %PY_VER%.
-        pause
-        exit /b 1
-    )
-    if %PY_MINOR% GEQ 14 (
-        echo.
-        echo  [ERROR] Python %PY_VER% is too new — PyTorch does not support it yet.
-        echo.
-        echo  Please install Python 3.12 or 3.13 from:
-        echo    https://www.python.org/downloads/
-        echo.
-        echo  You can have multiple Python versions installed at once.
-        echo  After installing 3.12/3.13, run this setup again.
-        pause
-        exit /b 1
-    )
-)
+echo  [OK] Found Python %PY_VER% (using: !PYTHON!)
 echo.
 
 :: ── Create virtual environment ────────────────────────────────────────────────
@@ -63,7 +55,7 @@ if exist ".venv\Scripts\python.exe" (
     echo  [OK] Virtual environment already exists, skipping creation.
 ) else (
     echo  Creating virtual environment...
-    python -m venv .venv
+    !PYTHON! -m venv .venv
     if errorlevel 1 (
         echo  [ERROR] Failed to create virtual environment.
         pause
@@ -75,7 +67,7 @@ echo.
 
 :: ── Upgrade pip ───────────────────────────────────────────────────────────────
 echo  Upgrading pip...
-.venv\Scripts\python.exe -m pip install --upgrade pip --quiet --no-warn-script-location
+.venv\Scripts\python.exe -m pip install --upgrade pip --quiet
 echo  [OK] pip up to date.
 echo.
 
