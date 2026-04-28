@@ -105,6 +105,29 @@ if "%TORCH_OK%"=="0" (
 echo  [OK] PyTorch installed.
 echo.
 
+:: ── TTS models (installed first so their numpy/etc pins take priority) ────────
+:: Use --only-binary for spacy/thinc/blis so pip never tries to compile them from source.
+echo  Installing Kokoro...
+.venv\Scripts\pip install kokoro --only-binary spacy,thinc,blis,cymem,murmurhash,preshed,srsly,catalogue --quiet --no-cache-dir
+if errorlevel 1 (
+    echo  [WARN] Kokoro install had issues. Trying without spaCy...
+    .venv\Scripts\pip install kokoro --no-deps --quiet --no-cache-dir
+    .venv\Scripts\pip install "misaki[en]" --only-binary spacy,thinc,blis,cymem,murmurhash,preshed,srsly,catalogue --quiet --no-cache-dir 2>nul
+    .venv\Scripts\pip install loguru einops piper-phonemize --quiet --no-cache-dir 2>nul
+)
+echo  [OK] Kokoro installed.
+
+echo  Installing Chatterbox...
+.venv\Scripts\pip install chatterbox-tts --quiet --no-cache-dir
+echo  [OK] Chatterbox installed.
+echo.
+
+:: ── Core dependencies (installed after TTS packages to respect their version pins) ──
+echo  Installing core dependencies...
+.venv\Scripts\pip install transformers accelerate snac soundfile PyQt6 --quiet --no-cache-dir
+echo  [OK] Core dependencies installed.
+echo.
+
 :: ── HuggingFace token ────────────────────────────────────────────────────────
 echo  ===========================================
 echo    HuggingFace Token (Orpheus model)
@@ -135,29 +158,6 @@ if exist "hf_token.txt" (
         echo  [SKIP] Add your token to hf_token.txt later.
     )
 )
-echo.
-
-:: ── TTS models (installed first so their numpy/etc pins take priority) ────────
-:: Use --only-binary for spacy/thinc/blis so pip never tries to compile them from source.
-echo  Installing Kokoro...
-.venv\Scripts\pip install kokoro --only-binary spacy,thinc,blis,cymem,murmurhash,preshed,srsly,catalogue --quiet --no-cache-dir
-if errorlevel 1 (
-    echo  [WARN] Kokoro install had issues. Trying without spaCy...
-    .venv\Scripts\pip install kokoro --no-deps --quiet --no-cache-dir
-    .venv\Scripts\pip install "misaki[en]" --only-binary spacy,thinc,blis,cymem,murmurhash,preshed,srsly,catalogue --quiet --no-cache-dir 2>nul
-    .venv\Scripts\pip install loguru einops piper-phonemize --quiet --no-cache-dir 2>nul
-)
-echo  [OK] Kokoro installed.
-
-echo  Installing Chatterbox...
-.venv\Scripts\pip install chatterbox-tts --quiet --no-cache-dir
-echo  [OK] Chatterbox installed.
-echo.
-
-:: ── Core dependencies (installed after TTS packages to respect their version pins) ──
-echo  Installing core dependencies...
-.venv\Scripts\pip install transformers accelerate snac soundfile PyQt6 --quiet --no-cache-dir
-echo  [OK] Core dependencies installed.
 echo.
 
 :: ── Done ─────────────────────────────────────────────────────────────────────
