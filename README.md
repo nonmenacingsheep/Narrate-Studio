@@ -4,6 +4,8 @@ A local, offline narration studio for Windows. Import a script, assign voices to
 
 Built with [Orpheus TTS](https://github.com/canopylabs/orpheus-tts), [Kokoro](https://github.com/hexgrad/kokoro), and [Chatterbox](https://github.com/resemble-ai/chatterbox).
 
+I made this for myself using Claude, but I figured someone else might be able to use it as well. I hope you find it useful!
+
 ![OfflineNarrator](assets/UI.PNG)
 
 ---
