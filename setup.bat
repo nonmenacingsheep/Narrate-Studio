@@ -79,18 +79,18 @@ echo.
 set TORCH_OK=0
 
 echo  Trying CUDA 12.8...
-.venv\Scripts\pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 --quiet --no-cache-dir
+.venv\Scripts\pip install torch --index-url https://download.pytorch.org/whl/cu128 --quiet --no-cache-dir
 if not errorlevel 1 set TORCH_OK=1
 
 if "%TORCH_OK%"=="0" (
     echo  Trying CUDA 12.4...
-    .venv\Scripts\pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 --quiet --no-cache-dir
+    .venv\Scripts\pip install torch --index-url https://download.pytorch.org/whl/cu124 --quiet --no-cache-dir
     if not errorlevel 1 set TORCH_OK=1
 )
 
 if "%TORCH_OK%"=="0" (
     echo  Trying CUDA 12.1...
-    .venv\Scripts\pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 --quiet --no-cache-dir
+    .venv\Scripts\pip install torch --index-url https://download.pytorch.org/whl/cu121 --quiet --no-cache-dir
     if not errorlevel 1 set TORCH_OK=1
 )
 
@@ -99,7 +99,7 @@ if "%TORCH_OK%"=="0" (
     echo  [WARN] No CUDA build found. Installing CPU-only PyTorch.
     echo  The app will work but generation will be very slow without a GPU.
     echo.
-    .venv\Scripts\pip install torch torchvision torchaudio --quiet --no-cache-dir
+    .venv\Scripts\pip install torch --quiet --no-cache-dir
 )
 
 echo  [OK] PyTorch installed.
@@ -111,16 +111,7 @@ echo  Installing core dependencies...
 echo  [OK] Core dependencies installed.
 echo.
 
-:: ── TTS models ────────────────────────────────────────────────────────────────
-echo  Installing TTS model packages...
-.venv\Scripts\pip install kokoro --quiet --no-cache-dir
-echo  [OK] Kokoro installed.
-
-.venv\Scripts\pip install chatterbox-tts --quiet --no-cache-dir
-echo  [OK] Chatterbox installed.
-echo.
-
-:: ── spaCy (optional — Kokoro works without it) ───────────────────────────────
+:: ── spaCy (install before TTS packages so they don't try to build it from source) ──
 echo  Installing spaCy (optional, improves Kokoro quality)...
 .venv\Scripts\pip install "spacy>=3.7,<4.0" --only-binary spacy,blis,thinc,cymem,murmurhash,preshed,srsly,catalogue --quiet --no-cache-dir
 if errorlevel 1 (
@@ -129,6 +120,15 @@ if errorlevel 1 (
 ) else (
     echo  [OK] spaCy installed.
 )
+echo.
+
+:: ── TTS models ────────────────────────────────────────────────────────────────
+echo  Installing TTS model packages...
+.venv\Scripts\pip install kokoro --quiet --no-cache-dir
+echo  [OK] Kokoro installed.
+
+.venv\Scripts\pip install chatterbox-tts --quiet --no-cache-dir
+echo  [OK] Chatterbox installed.
 echo.
 
 :: ── HuggingFace token ────────────────────────────────────────────────────────
