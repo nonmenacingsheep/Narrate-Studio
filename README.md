@@ -21,7 +21,7 @@ I made this for myself using Claude, but I figured someone else might be able to
   > winget install Python.Python.3.13
   > ```
 - **NVIDIA GPU strongly recommended** — an RTX card will generate in seconds; CPU works but is very slow
-- **~10 GB free disk space** for model downloads (cached locally after first run)
+- **~20 GB free disk space** for model downloads (cached locally after first run)
 - A free **HuggingFace account** for the Orpheus model (see setup)
 
 ---
@@ -38,7 +38,7 @@ I made this for myself using Claude, but I figured someone else might be able to
 
 3. **Double-click `run.bat`** to launch the app.
 
-> On first launch, each model you use will download automatically and be cached for all future runs. Orpheus is ~6 GB, so the first generation will take a while — subsequent ones are fast.
+> On first launch, each model you use will download automatically and be cached for all future runs. Orpheus is ~14 GB, so the first generation will take a while — subsequent ones are fast.
 
 ---
 
@@ -127,9 +127,9 @@ Use **💾 Save** and **📁 Load** to save your work as a `.ttsproj` file. This
 
 | Model | Voice quality | Notes |
 |---|---|---|
-| **Orpheus** | ⭐⭐⭐⭐⭐ | Best expressiveness. Supports emotion tags. ~6 GB. Requires HF token. |
+| **Orpheus** | ⭐⭐⭐⭐⭐ | Best expressiveness. Supports emotion tags. ~14 GB. Requires HF token. |
 | **Kokoro** | ⭐⭐⭐⭐ | Fast, high quality, many voices. ~400 MB. No account needed. |
-| **Chatterbox** | ⭐⭐⭐⭐ | Voice cloning from a reference clip. ~1 GB. No account needed. |
+| **Chatterbox** | ⭐⭐⭐⭐ | Voice cloning from a reference clip. ~3 GB. No account needed. |
 
 ### Orpheus emotion tags
 

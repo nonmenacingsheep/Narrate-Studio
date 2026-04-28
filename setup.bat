@@ -169,8 +169,8 @@ echo.
 echo  Double-click run.bat to launch OfflineNarrator.
 echo.
 echo  First launch will download TTS models automatically:
-echo    Orpheus    ~6 GB  (requires HuggingFace token)
+echo    Orpheus    ~14 GB  (requires HuggingFace token)
 echo    Kokoro     ~400 MB
-echo    Chatterbox ~1 GB
+echo    Chatterbox ~3 GB
 echo.
 pause
