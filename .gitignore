@@ -1,0 +1,25 @@
+# Python environment
+.venv/
+
+# HuggingFace model cache
+.hf_cache/
+
+# Personal token — NEVER commit this
+hf_token.txt
+
+# Generated audio
+*.wav
+*.mp3
+
+# Saved projects (user data)
+*.ttsproj
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
