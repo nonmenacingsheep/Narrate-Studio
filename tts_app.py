@@ -1679,15 +1679,23 @@ class StudioWindow(QMainWindow):
             self._mark_dirty()
 
     def _on_reorder(self, seg_id: str, new_index: int):
+        # new_index is a layout index (_empty_lbl sits at layout pos 0,
+        # so layout pos N == _segments index N-1)
         old_idx = next((i for i, s in enumerate(self._segments) if s.id == seg_id), -1)
-        if old_idx < 0 or old_idx == new_index:
+        old_layout_pos = old_idx + 1   # +1 to account for _empty_lbl
+        if old_idx < 0 or new_index == old_layout_pos:
             return
         seg = self._segments.pop(old_idx)
         w   = self._widgets[seg_id]
         self._seg_layout.removeWidget(w)
-        target = min(new_index, len(self._segments))
-        self._segments.insert(target, seg)
-        self._seg_layout.insertWidget(target, w)
+        # After removal, indices past the old position shift down by 1
+        if new_index > old_layout_pos:
+            layout_target = new_index - 1
+        else:
+            layout_target = new_index
+        seg_target = max(0, min(layout_target - 1, len(self._segments)))
+        self._segments.insert(seg_target, seg)
+        self._seg_layout.insertWidget(layout_target, w)
         self._renumber()
         self._rebuild_playback()
         self._mark_dirty()
