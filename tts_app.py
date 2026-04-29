@@ -1586,7 +1586,8 @@ class StudioWindow(QMainWindow):
             self._seg_layout.insertWidget(self._seg_layout.count() - 1, w)
         else:
             self._segments.insert(index, seg)
-            self._seg_layout.insertWidget(index, w)
+            # +1 to skip the _empty_lbl at layout position 0
+            self._seg_layout.insertWidget(index + 1, w)
 
         self._widgets[seg.id] = w
         self._renumber()
