@@ -1270,7 +1270,7 @@ class PlaybackBar(QWidget):
         row.addWidget(QLabel("🔊"))
 
         self.vol = QSlider(Qt.Orientation.Horizontal)
-        self.vol.setRange(0, 100)
+        self.vol.setRange(0, 200)
         self.vol.setValue(80)
         self.vol.setFixedWidth(80)
         row.addWidget(self.vol)
@@ -1351,7 +1351,7 @@ class PlaybackBar(QWidget):
 
     def _on_vol(self, v: int):
         if self._output:
-            self._output.setVolume(v / 100)
+            self._output.setVolume(v / 100.0)
 
 # ── Main window ───────────────────────────────────────────────────────────────
 
