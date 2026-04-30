@@ -1215,6 +1215,7 @@ class SegmentTimeline(QWidget):
 class PlaybackBar(QWidget):
     position_changed = pyqtSignal(int)
     media_loaded     = pyqtSignal()
+    user_seeked      = pyqtSignal(int)   # emitted when user explicitly seeks
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1328,11 +1329,13 @@ class PlaybackBar(QWidget):
     def _on_timeline_seek(self, ms: int):
         if self._player:
             self._player.setPosition(ms)
+            self.user_seeked.emit(ms)
 
     def seek_and_play(self, ms: int):
         if self._player:
             self._player.setPosition(ms)
             self._player.play()
+            self.user_seeked.emit(ms)
 
     def is_playing(self) -> bool:
         return (self._player is not None and
@@ -1450,6 +1453,7 @@ class StudioWindow(QMainWindow):
 
         self._pb = PlaybackBar(self)
         self._pb.position_changed.connect(self._on_playback_pos)
+        self._pb.user_seeked.connect(self._on_user_seeked)
         root.addWidget(self._pb)
 
         self.setStatusBar(QStatusBar())
@@ -1981,6 +1985,15 @@ class StudioWindow(QMainWindow):
         self._pb.load(self._temp_wav)
         self._pb.load_timeline(timeline_map)
 
+    def _on_user_seeked(self, ms: int):
+        """Explicit user seek (timeline click or 'Play from here') — scroll list to that segment."""
+        for start, end, sid in self._playback_map:
+            if start <= ms < end:
+                w = self._widgets.get(sid)
+                if w and self._seg_scroll:
+                    self._seg_scroll.ensureWidgetVisible(w)
+                break
+
     def _on_playback_pos(self, ms: int):
         if self._loading_audio:
             return
@@ -1997,7 +2010,7 @@ class StudioWindow(QMainWindow):
         if playing_id and playing_id in self._widgets:
             w = self._widgets[playing_id]
             w.set_playing(True)
-            if self._seg_scroll:
+            if self._seg_scroll and self._pb.is_playing():
                 self._seg_scroll.ensureWidgetVisible(w)
 
     # ── Import ────────────────────────────────────────────────────────────────
