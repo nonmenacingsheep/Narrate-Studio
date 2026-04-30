@@ -1359,7 +1359,8 @@ class PlaybackBar(QWidget):
             "⏸" if state == QMediaPlayer.PlaybackState.PlayingState else "▶")
 
     def _on_media_status(self, status):
-        if status == QMediaPlayer.MediaStatus.LoadedMedia:
+        if status in (QMediaPlayer.MediaStatus.LoadedMedia,
+                      QMediaPlayer.MediaStatus.BufferedMedia):
             self.media_loaded.emit()
 
     def _on_speed(self, idx: int):
