@@ -500,6 +500,7 @@ class SegmentWidget(QFrame):
     merge_requested        = pyqtSignal(str)         # merge with next
     duplicate_requested    = pyqtSignal(str)
     silence_requested      = pyqtSignal(str)
+    play_from_requested    = pyqtSignal(str)
 
     def __init__(self, segment: Segment, voices: dict, parent=None):
         super().__init__(parent)
@@ -710,6 +711,8 @@ class SegmentWidget(QFrame):
 
     def contextMenuEvent(self, e):
         menu = QMenu(self)
+        menu.addAction("▶  Play from here", lambda: self.play_from_requested.emit(self._seg.id))
+        menu.addSeparator()
         menu.addAction("✏️  Edit",       self._start_edit)
         menu.addAction("↺  Regenerate", lambda: self.regenerate_requested.emit(self._seg.id))
         menu.addSeparator()
@@ -1324,6 +1327,11 @@ class PlaybackBar(QWidget):
         if self._player:
             self._player.setPosition(ms)
 
+    def seek_and_play(self, ms: int):
+        if self._player:
+            self._player.setPosition(ms)
+            self._player.play()
+
     def _on_pos(self, ms: int):
         dur = self._player.duration()
         self.timeline.set_position(ms)
@@ -1573,6 +1581,7 @@ class StudioWindow(QMainWindow):
         w.regenerate_requested.connect(self._on_regen_one)
         w.delete_requested.connect(self._delete_segment)
         w.add_above_requested.connect(self._add_blank_above)
+        w.play_from_requested.connect(self._on_play_from)
         w.selection_toggled.connect(self._on_selection_toggled)
         w.split_requested.connect(self._split_segment)
         w.merge_requested.connect(self._merge_with_next)
@@ -1895,6 +1904,12 @@ class StudioWindow(QMainWindow):
             w.set_regen_enabled(True)
 
     # ── Playback ──────────────────────────────────────────────────────────────
+
+    def _on_play_from(self, seg_id: str):
+        for start_ms, _end_ms, sid in self._playback_map:
+            if sid == seg_id:
+                self._pb.seek_and_play(start_ms)
+                return
 
     def _rebuild_playback(self):
         generated = [(s, s.audio) for s in self._segments
