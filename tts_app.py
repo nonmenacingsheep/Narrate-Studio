@@ -1338,6 +1338,13 @@ class PlaybackBar(QWidget):
         return (self._player is not None and
                 self._player.playbackState() == QMediaPlayer.PlaybackState.PlayingState)
 
+    def position(self) -> int:
+        return self._player.position() if self._player else 0
+
+    def seek(self, ms: int):
+        if self._player:
+            self._player.setPosition(ms)
+
     def _on_pos(self, ms: int):
         dur = self._player.duration()
         self.timeline.set_position(ms)
@@ -1957,13 +1964,9 @@ class StudioWindow(QMainWindow):
         sf.write(tmp.name, combined, 24000)
         tmp.close()
         self._temp_wav = tmp.name
-        # Block _on_playback_pos entirely while the player loads the new source.
-        # positionChanged fires spuriously (at the old seek position, then at 0)
-        # both before and after LoadedMedia. We suppress all of it, then after
-        # LoadedMedia we restore the scroll and prime _last_playing_id to the
-        # first segment so any late positionChanged(0) is a no-op.
-        saved_scroll = (self._seg_scroll.verticalScrollBar().value()
-                        if self._seg_scroll else 0)
+        # Preserve playback position across the reload so the player doesn't
+        # snap back to 0, which would cause the scroll-follow to jump to top.
+        saved_pos = self._pb.position()
         self._loading_audio = True
         def _on_loaded():
             try:
@@ -1971,10 +1974,8 @@ class StudioWindow(QMainWindow):
             except Exception:
                 pass
             self._loading_audio = False
-            self._last_playing_id = (self._playback_map[0][2]
-                                     if self._playback_map else None)
-            if self._seg_scroll:
-                self._seg_scroll.verticalScrollBar().setValue(saved_scroll)
+            if saved_pos > 0:
+                self._pb.seek(saved_pos)
         self._pb.media_loaded.connect(_on_loaded)
         self._pb.load(self._temp_wav)
         self._pb.load_timeline(timeline_map)
