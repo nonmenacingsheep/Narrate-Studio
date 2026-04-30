@@ -1950,8 +1950,12 @@ class StudioWindow(QMainWindow):
         sf.write(tmp.name, combined, 24000)
         tmp.close()
         self._temp_wav = tmp.name
+        scroll_pos = (self._seg_scroll.verticalScrollBar().value()
+                      if self._seg_scroll else 0)
         self._pb.load(self._temp_wav)
         self._pb.load_timeline(timeline_map)
+        if self._seg_scroll:
+            self._seg_scroll.verticalScrollBar().setValue(scroll_pos)
 
     def _on_playback_pos(self, ms: int):
         playing_id = None
@@ -1967,7 +1971,7 @@ class StudioWindow(QMainWindow):
         if playing_id and playing_id in self._widgets:
             w = self._widgets[playing_id]
             w.set_playing(True)
-            if self._seg_scroll and self._pb.is_playing():
+            if self._seg_scroll:
                 self._seg_scroll.ensureWidgetVisible(w)
 
     # ── Import ────────────────────────────────────────────────────────────────
