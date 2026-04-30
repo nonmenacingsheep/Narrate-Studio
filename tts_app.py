@@ -1332,6 +1332,10 @@ class PlaybackBar(QWidget):
             self._player.setPosition(ms)
             self._player.play()
 
+    def is_playing(self) -> bool:
+        return (self._player is not None and
+                self._player.playbackState() == QMediaPlayer.PlaybackState.PlayingState)
+
     def _on_pos(self, ms: int):
         dur = self._player.duration()
         self.timeline.set_position(ms)
@@ -1963,7 +1967,7 @@ class StudioWindow(QMainWindow):
         if playing_id and playing_id in self._widgets:
             w = self._widgets[playing_id]
             w.set_playing(True)
-            if self._seg_scroll:
+            if self._seg_scroll and self._pb.is_playing():
                 self._seg_scroll.ensureWidgetVisible(w)
 
     # ── Import ────────────────────────────────────────────────────────────────
